@@ -5,7 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ChevronRight, X } from "lucide-react";
+import { createPortal } from "react-dom";
+import { ArrowUpRight, ChevronRight, X } from "lucide-react";
+import { PresentationDeck } from "@/components/presentation/PresentationDeck";
 import { megaNav, type MegaGroup } from "@/data/nav";
 import { cn } from "@/lib/format";
 
@@ -14,6 +16,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [panel, setPanel] = useState<MegaGroup | null>(null);
   const [mobile, setMobile] = useState(false);
+  const [deck, setDeck] = useState(false);
   const [lastPath, setLastPath] = useState(pathname);
 
   if (pathname !== lastPath) {
@@ -90,6 +93,22 @@ export function Header() {
                   </Link>
                 </li>
               ))}
+              <li className="ml-2">
+                <button
+                  type="button"
+                  onClick={() => setDeck(true)}
+                  onMouseEnter={() => setPanel(null)}
+                  className={cn(
+                    "group flex items-center gap-2.5 rounded-[4px] py-1 pl-3.5 pr-1 text-sm font-medium transition-colors",
+                    dark ? "bg-white/10 text-white ring-1 ring-inset ring-white/25 hover:bg-white/20" : "bg-ink text-white hover:bg-brand",
+                  )}
+                >
+                  Presentación
+                  <span className="grid size-6 place-items-center rounded-[3px] bg-mint text-brand-950">
+                    <ArrowUpRight className="size-3.5 transition-transform group-hover:rotate-45" aria-hidden />
+                  </span>
+                </button>
+              </li>
             </ul>
           </nav>
 
@@ -174,6 +193,18 @@ export function Header() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobile(false);
+                    setDeck(true);
+                  }}
+                  className="flex w-full items-center justify-between rounded-[4px] px-3 py-4 text-lg font-medium text-ink hover:bg-black/5"
+                >
+                  Presentación <ArrowUpRight className="size-5 text-brand-600" />
+                </button>
+              </li>
               {[{ label: "Sea miembro", href: "/sea-miembro-fenalco" }, { label: "Afiliados", href: "/iniciar-sesion" }, { label: "Pagos en línea", href: "/pagos-en-linea" }].map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className="flex items-center justify-between rounded-[4px] px-3 py-4 text-lg font-medium text-ink hover:bg-black/5">
@@ -185,6 +216,7 @@ export function Header() {
           </motion.div>
         )}
       </AnimatePresence>
+      {deck && createPortal(<PresentationDeck onClose={() => setDeck(false)} />, document.body)}
     </header>
   );
 }
